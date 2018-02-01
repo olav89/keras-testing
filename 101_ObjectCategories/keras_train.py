@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
-from split import split_files
+from split_data import split_files
 import os
 from keras.utils import plot_model
 
@@ -13,9 +13,9 @@ img_width, img_height = 150, 150
 
 train_data_dir = 'train'
 validation_data_dir = 'validate'
-num_classes = 4
+num_classes = 3
 nb_train_samples, nb_validation_samples = split_files(num_classes=num_classes, split_ratio=0.2)
-epochs = 15
+epochs = 1
 batch_size = 8
 
 if K.image_data_format() == 'channels_first':

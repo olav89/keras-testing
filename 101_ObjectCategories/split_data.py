@@ -4,9 +4,9 @@ import numpy as np
 
 
 def split_files(num_classes=2, split_ratio=0.2):
-    base = os.getcwdu() + "/101_ObjectCategories"
-    train = os.getcwdu() + "/train"
-    validate = os.getcwdu() + "/validate"
+    base = os.getcwd() + "/101_ObjectCategories"
+    train = os.getcwd() + "/train"
+    validate = os.getcwd() + "/validate"
 
     # remove old directories
     shutil.rmtree(train, ignore_errors=True)
@@ -41,7 +41,7 @@ def split_files(num_classes=2, split_ratio=0.2):
                 shutil.copyfile("{}/{}".format(folder, file), "{}/{}".format(dir_train, file))
                 num_train += 1
 
-    print "Train images: {}, Validation images: {}".format(num_train, num_validate)
+    print("Train images: {}, Validation images: {}".format(num_train, num_validate))
     return num_train, num_validate
 
 

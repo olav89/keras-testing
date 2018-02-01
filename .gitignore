@@ -1,4 +1,7 @@
 101_ObjectCategories/101_ObjectCategories
+101_ObjectCategories/__pycache__/
+101_ObjectCategories/*.h5
 101_ObjectCategories/train
 101_ObjectCategories/validate
 101_ObjectCategories/101_ObjectCategories.tar.gz
+.idea/
