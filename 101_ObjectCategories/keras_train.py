@@ -13,10 +13,10 @@ img_width, img_height = 150, 150
 
 train_data_dir = 'train'
 validation_data_dir = 'validate'
-num_classes = 3
+num_classes = 5
 nb_train_samples, nb_validation_samples = split_files(num_classes=num_classes, split_ratio=0.2)
-epochs = 1
-batch_size = 8
+epochs = 5
+batch_size = 10
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
