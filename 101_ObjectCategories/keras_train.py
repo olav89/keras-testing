@@ -9,14 +9,15 @@ from split_data import split_files
 import os
 from keras.utils import plot_model
 
+model_name = "model_cnn.h5"
 img_width, img_height = 150, 150
 
 train_data_dir = 'train'
 validation_data_dir = 'validate'
-num_classes = 5
+num_classes = 6
 nb_train_samples, nb_validation_samples = split_files(num_classes=num_classes, split_ratio=0.2)
 epochs = 5
-batch_size = 10
+batch_size = 18
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -47,14 +48,17 @@ def train():
         class_mode='categorical')
 
     model = make_model_cnn()
+
     model.fit_generator(
         train_generator,
         steps_per_epoch=nb_train_samples // batch_size,
         epochs=epochs,
         validation_data=validation_generator,
-        validation_steps=nb_validation_samples // batch_size)
-
-    model.save('model_cnn.h5')
+        validation_steps=nb_validation_samples // batch_size,
+        callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.05, patience=3,
+                                                 verbose=0, mode='auto'),
+                   keras.callbacks.ModelCheckpoint(model_name, monitor='val_loss', verbose=0, save_best_only=True,
+                                                   save_weights_only=False, mode='auto', period=1)])
 
 
 def make_model_cnn():

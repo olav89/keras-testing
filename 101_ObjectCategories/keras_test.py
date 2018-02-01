@@ -30,8 +30,8 @@ def test():
         class_mode='categorical',
         shuffle=False)
 
-    #loss, acc = model.evaluate_generator(validation_generator)
-    #print('loss: {}, accuracy: {}'.format(loss, acc))
+    loss, acc = model.evaluate_generator(validation_generator)
+    print('loss: {}, accuracy: {}'.format(loss, acc))
 
     classes = validation_generator.class_indices
     print('Classes: {}'.format(classes))
@@ -45,7 +45,8 @@ def test():
         print('Prediction: {} \n-> {}'.format(pred, classes_inv[max_pred]))"""
     i = 0
     max_test = 20
-    print('Checking {} shuffled images..'.format(max_test))
+    print('Checking {} non-shuffled images..'.format(max_test))
+    # shuffling breaks filenames since they are not shuffled
     for batch_x, batch_y in validation_generator:
         if i >= max_test:
             break
@@ -54,11 +55,12 @@ def test():
         max_pred = np.max(predicted)
         predicted_class = classes_inv[np.argmax(predicted)]
         correct_class = classes_inv[np.argmax(batch_y)]
-
-
+        try:
+            filename = validation_generator.filenames[validation_generator.batch_index-1]
+        except:
+            filename = "error retrieving filename"
         if predicted_class != correct_class:
-            print(validation_generator.filenames[validation_generator.batch_index-1])
-            print('Predicted wrong class ({:3.2f}): {} [{}]'.format(max_pred, predicted_class, correct_class))
+            print('Predicted wrong class ({:3.2f}): {} [{}]'.format(max_pred, predicted_class, filename))
 
 
 
