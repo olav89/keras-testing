@@ -44,7 +44,8 @@ def test():
         max_pred = np.argmax(pred)
         print('Prediction: {} \n-> {}'.format(pred, classes_inv[max_pred]))"""
     i = 0
-    max_test = 20
+    max_test = 10
+    num_errors = 0
     print('Checking {} non-shuffled images..'.format(max_test))
     # shuffling breaks filenames since they are not shuffled
     for batch_x, batch_y in validation_generator:
@@ -52,6 +53,7 @@ def test():
             break
         i += 1
         predicted = model.predict(batch_x, batch_size=batch_size)
+        predicted = np.round(predicted, decimals=3)
         max_pred = np.max(predicted)
         predicted_class = classes_inv[np.argmax(predicted)]
         correct_class = classes_inv[np.argmax(batch_y)]
@@ -60,9 +62,11 @@ def test():
         except:
             filename = "error retrieving filename"
         if predicted_class != correct_class:
-            print('Predicted wrong class ({:3.2f}): {} [{}]'.format(max_pred, predicted_class, filename))
-
+            num_errors += 1
+            print('Predicted wrong class ({:.3f} - {}): {} [{}]'.format(max_pred, predicted, predicted_class, filename))
+    print('Errors in checked images: {}'.format(num_errors))
 
 
 if __name__ == "__main__":
     test()
+    K.clear_session()

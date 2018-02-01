@@ -14,10 +14,10 @@ img_width, img_height = 150, 150
 
 train_data_dir = 'train'
 validation_data_dir = 'validate'
-num_classes = 6
+num_classes = 5
 nb_train_samples, nb_validation_samples = split_files(num_classes=num_classes, split_ratio=0.2)
 epochs = 5
-batch_size = 18
+batch_size = 8
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -55,10 +55,17 @@ def train():
         epochs=epochs,
         validation_data=validation_generator,
         validation_steps=nb_validation_samples // batch_size,
-        callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.05, patience=3,
+        callbacks=[
+            keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.05, patience=3,
                                                  verbose=0, mode='auto'),
-                   keras.callbacks.ModelCheckpoint(model_name, monitor='val_loss', verbose=0, save_best_only=True,
-                                                   save_weights_only=False, mode='auto', period=1)])
+            keras.callbacks.ModelCheckpoint(model_name, monitor='val_loss', verbose=0, save_best_only=True,
+                                                   save_weights_only=False, mode='auto', period=1),
+            keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batch_size, write_graph=True,
+                                               write_grads=False, write_images=False, embeddings_freq=0,
+                                               embeddings_layer_names=None, embeddings_metadata=None),
+            keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=0, mode='auto',
+                                              epsilon=0.0001, cooldown=0, min_lr=0.0001)])
+    print("Training completed.")
 
 
 def make_model_cnn():
@@ -101,3 +108,4 @@ def save_preview_images(train_datagen):
 
 if __name__ == "__main__":
     train()
+    K.clear_session()  # attempt at fixing py3 None Type bug
