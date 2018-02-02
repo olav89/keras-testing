@@ -7,9 +7,10 @@ from keras import backend as K
 
 img_width, img_height = 150, 150
 
+print_files = False
+
 train_data_dir = 'train'
 validation_data_dir = 'validate'
-num_classes = 3
 batch_size = 1
 
 if K.image_data_format() == 'channels_first':
@@ -44,7 +45,7 @@ def test():
         max_pred = np.argmax(pred)
         print('Prediction: {} \n-> {}'.format(pred, classes_inv[max_pred]))"""
     i = 0
-    max_test = 10
+    max_test = validation_generator.__len__()
     num_errors = 0
     print('Checking {} non-shuffled images..'.format(max_test))
     # shuffling breaks filenames since they are not shuffled
@@ -63,7 +64,8 @@ def test():
             filename = "error retrieving filename"
         if predicted_class != correct_class:
             num_errors += 1
-            print('Predicted wrong class ({:.3f} - {}): {} [{}]'.format(max_pred, predicted, predicted_class, filename))
+            if print_files:
+                print('Predicted wrong class ({:.3f} - {}): {} [{}]'.format(max_pred, predicted, predicted_class, filename))
     print('Errors in checked images: {}'.format(num_errors))
 
 

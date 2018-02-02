@@ -7,6 +7,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 from split_data import split_files
 import os
+import shutil
 from keras.utils import plot_model
 
 model_name = "model_cnn.h5"
@@ -14,10 +15,11 @@ img_width, img_height = 150, 150
 
 train_data_dir = 'train'
 validation_data_dir = 'validate'
-num_classes = 5
+log_dir = 'logs'
+num_classes = 15
 nb_train_samples, nb_validation_samples = split_files(num_classes=num_classes, split_ratio=0.2)
-epochs = 5
-batch_size = 8
+epochs = 10
+batch_size = 32
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -48,6 +50,8 @@ def train():
         class_mode='categorical')
 
     model = make_model_cnn()
+    # remove old logs
+    shutil.rmtree('{}/{}'.format(os.getcwd(), log_dir), ignore_errors=True)
 
     model.fit_generator(
         train_generator,
@@ -56,11 +60,11 @@ def train():
         validation_data=validation_generator,
         validation_steps=nb_validation_samples // batch_size,
         callbacks=[
-            keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.05, patience=3,
+            keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3,
                                                  verbose=0, mode='auto'),
             keras.callbacks.ModelCheckpoint(model_name, monitor='val_loss', verbose=0, save_best_only=True,
                                                    save_weights_only=False, mode='auto', period=1),
-            keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batch_size, write_graph=True,
+            keras.callbacks.TensorBoard(log_dir='./{}'.format(log_dir), histogram_freq=0, batch_size=batch_size, write_graph=True,
                                                write_grads=False, write_images=False, embeddings_freq=0,
                                                embeddings_layer_names=None, embeddings_metadata=None),
             keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=0, mode='auto',
@@ -76,6 +80,11 @@ def make_model_cnn():
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Conv2D(128, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.2))
     model.add(Flatten())
     model.add(Dense(128, activation='relu'))
     model.add(Dropout(0.5))
