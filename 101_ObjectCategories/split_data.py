@@ -18,6 +18,7 @@ def split_files(num_classes=2, split_ratio=0.2):
 
     folders = [x[0] for x in os.walk(base)] # find all directories
     folders.pop(0) # remove base dir
+    folders = sorted(folders)
 
     # select directories to use
     if 1 < num_classes < len(folders):
@@ -46,4 +47,4 @@ def split_files(num_classes=2, split_ratio=0.2):
 
 
 if __name__ == "__main__":
-    split_files(num_classes=2, split_ratio=0.2)
+    x, y = split_files(num_classes=10, split_ratio=0.2)
