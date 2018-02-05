@@ -7,7 +7,7 @@ from keras import backend as K
 
 img_width, img_height = 150, 150
 
-print_files = False
+print_files = True
 
 train_data_dir = 'train'
 validation_data_dir = 'validate'
@@ -67,6 +67,8 @@ def test():
             if print_files:
                 print('Predicted wrong class ({:.3f} - {}): {} [{}]'.format(max_pred, predicted, predicted_class, filename))
     print('Errors in checked images: {}'.format(num_errors))
+
+
 
 
 if __name__ == "__main__":

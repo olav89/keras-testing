@@ -2,11 +2,15 @@ import os
 import shutil
 import numpy as np
 
+use_picks = False
 
 def split_files(num_classes=2, split_ratio=0.2):
     base = os.getcwd() + "/101_ObjectCategories"
     train = os.getcwd() + "/train"
     validate = os.getcwd() + "/validate"
+
+    picks = ["pizza", "stop_sign", "sunflower"]
+    picks = [base + "/" + s for s in picks]
 
     # remove old directories
     shutil.rmtree(train, ignore_errors=True)
@@ -19,6 +23,8 @@ def split_files(num_classes=2, split_ratio=0.2):
     folders = [x[0] for x in os.walk(base)] # find all directories
     folders.pop(0) # remove base dir
     folders = sorted(folders)
+    if use_picks:
+        folders = picks
 
     # select directories to use
     if 1 < num_classes < len(folders):

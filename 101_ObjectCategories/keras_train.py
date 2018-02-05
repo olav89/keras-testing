@@ -3,7 +3,7 @@ import keras
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Activation, Dropout, Flatten, Dense, ZeroPadding2D
 from keras import backend as K
 from split_data import split_files
 import os
@@ -16,9 +16,9 @@ img_width, img_height = 150, 150
 train_data_dir = 'train'
 validation_data_dir = 'validate'
 log_dir = 'logs'
-num_classes = 15
+num_classes = 2
 nb_train_samples, nb_validation_samples = split_files(num_classes=num_classes, split_ratio=0.2)
-epochs = 10
+epochs = 5
 batch_size = 32
 
 if K.image_data_format() == 'channels_first':
@@ -68,26 +68,48 @@ def train():
                                                write_grads=False, write_images=False, embeddings_freq=0,
                                                embeddings_layer_names=None, embeddings_metadata=None),
             keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=0, mode='auto',
-                                              epsilon=0.0001, cooldown=0, min_lr=0.0001)])
+                                              epsilon=0.0001, cooldown=0, min_lr=1e6)])
     print("Training completed.")
 
 
 def make_model_cnn():
     model = Sequential()
+
     model.add(Conv2D(32, kernel_size=(3, 3),
                      activation='relu',
-                     input_shape=input_shape))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
+                     input_shape=input_shape, name="b1_c1"))
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(64, (3, 3), activation='relu', name="b1_c2"))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(Conv2D(128, (3, 3), activation='relu'))
+
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(128, (3, 3), activation='relu', name="b2_c1"))
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(128, (3, 3), activation='relu', name="b2_c2"))
     model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.3))
+
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(256, (3, 3), activation='relu', name="b3_c1"))
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(256, (3, 3), activation='relu', name="b3_c2"))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.3))
+
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(512, (3, 3), activation='relu', name="b4_c1"))
+    model.add(ZeroPadding2D((1, 1)))
+    model.add(Conv2D(512, (3, 3), activation='relu', name="b4_c2"))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.3))
+
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(1024, activation='relu'))
     model.add(Dropout(0.5))
+    model.add(Dense(512, activation='relu'))
+    model.add(Dropout(0.5))
+
     model.add(Dense(num_classes, activation='softmax'))
 
     model.compile(loss='categorical_crossentropy',
